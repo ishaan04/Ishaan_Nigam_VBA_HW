@@ -1,2 +1,2 @@
-# Ishaan_Nigam_VBA_HW
+# VBA-Challenge_Ishaan_nigam
 Week 2 VBA Homework Submission
