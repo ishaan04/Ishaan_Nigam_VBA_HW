@@ -1,0 +1,105 @@
+Attribute VB_Name = "Module1"
+Sub VBA_challenge_Ishaan()
+    
+    'declaring header names
+        Dim ticker_header As String
+        Dim date_header As String
+        Dim open_header As String
+        Dim high_header As String
+        Dim low_header As String
+        Dim close_header As String
+        Dim volume_header As String
+        
+    'declaring summary headers
+        Dim ticker_summary As String
+        Dim year_change_summary As String
+        Dim percent_change_summary As String
+        Dim total_value_summary As String
+    
+    'declaring item values
+        Dim ticker_code As Double
+        Dim open_value As Double
+        Dim high_value As Double
+        Dim low_value As Double
+        Dim close_value As Double
+        Dim volume_value As Double
+    
+    'declaring vba calculations
+        Dim ws As Worksheet
+        Dim ticker_count As Long
+        Dim volume_sum As Double
+        Dim last_row As Long
+        Dim year_change As Double
+        Dim percentage_change As Double
+        Dim output_range As Integer
+    
+    'output_range will paste values consequtively
+            output_range = 2
+    
+    'to process code through every single worksheets
+    For Each ws In Worksheets
+    
+        'paste headers into every worksheet
+            ws.Cells(1, 12).Value = "Ticker"
+            ws.Cells(1, 13).Value = "Yearly Change"
+            ws.Cells(1, 14).Value = "Percentage Change"
+            ws.Cells(1, 15).Value = "Total Volume"
+            
+        'identify how many rows in the sheet
+            last_row = ws.Cells(Rows.Count, 1).End(xlUp).Row
+        
+        'perform column scan and locate like-for-like tickers
+            For i = 2 To last_row
+            
+                If ws.Cells(i + 1, 1) = ws.Cells(i, 1) Then 'if the cell below is the same as the cell above then add one to the counter
+                    ticker_count = ticker_count + 1
+                    volume_sum = volume_sum + ws.Cells(i, 7) 'sum all of the volume for the like-for-like tickers
+                    
+                    If ticker_count = 1 Then 'if the code locates the first value of the ticker then declare that figure as open_value
+                        open_value = ws.Cells(i, 3)
+                    Else
+                End If
+            
+            Else
+                ws.Cells(output_range, 12) = ws.Cells(i, 1) 'output the ticker name in the summary table
+                ws.Cells(output_range, 15) = volume_sum 'output the volume in the summary table
+            
+                close_value = ws.Cells(i, 6) 'locate the close_value in the data for the same ticker
+            
+            If open_value <> 0 Then 'if open value is not equal to 0 then preform the calulcations for the summary table. We need this because we wont be able to calculate % change for tickers that don't have an open value
+                year_change = close_value - open_value 'this calcualtes the yearly change for the ticker price
+                percent_change = (close_value - open_value) / open_value 'this calculates the rate of change for the ticker price
+                
+            Else
+                year_change = 0 'if the open_value is 0 then it will not make any calculations
+                percent_change = 0 'if it is 0 then output 0 as it will not make any calculations
+                
+            End If
+            
+            ws.Cells(output_range, 13).Value = year_change 'output the year_change to the respective ticker on summary table
+            ws.Cells(output_range, 14).Value = percent_change 'output the percent_change to the respective ticker on the summary table
+           
+        'conditional formatting to identify postive and negative ticker price changes
+            If ws.Cells(output_range, 13) < 0 Then
+                    ws.Cells(output_range, 13).Interior.ColorIndex = 3 'red located from https://www.automateexcel.com/excel-formatting/color-reference-for-color-index/
+            Else
+                    ws.Cells(output_range, 13).Interior.ColorIndex = 10 'green located from https://www.automateexcel.com/excel-formatting/color-reference-for-color-index/
+            End If
+           
+        'reset the ticker counter and volume_sum and make the code go though into the next ticker set
+            ticker_count = 0
+            volume_sum = 0
+            output_range = output_range + 1
+         
+            End If
+        Next i
+         
+        'reset the output_range to start at 2 again so that the next ticker can be processed into the ticker summary table
+        output_range = 2
+      
+    Next ws
+End Sub
+
+
+
+
